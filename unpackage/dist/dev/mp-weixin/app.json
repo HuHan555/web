@@ -1,0 +1,48 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/test/test",
+    "pages/search/search",
+    "pages/message/message",
+    "pages/index/index",
+    "pages/login/register",
+    "pages/login/forget",
+    "pages/about/about",
+    "pages/navigator/navigator",
+    "pages/chatroom/chatroom",
+    "pages/index/index1"
+  ],
+  "subPackages": [],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "color": "#808080",
+    "selectedColor": "#007AFF",
+    "backgroundColor": "#FFFFFF",
+    "list": [
+      {
+        "pagePath": "pages/message/message",
+        "iconPath": "static/logo.png",
+        "selectedIconPath": "static/imgs/4.png",
+        "text": "消息"
+      },
+      {
+        "pagePath": "pages/index/index",
+        "iconPath": "static/imgs/logo.png",
+        "selectedIconPath": "static/logo.png",
+        "text": "记录"
+      },
+      {
+        "pagePath": "pages/about/about",
+        "iconPath": "static/imgs/4.png",
+        "selectedIconPath": "static/logo.png",
+        "text": "我的"
+      }
+    ]
+  },
+  "usingComponents": {}
+}

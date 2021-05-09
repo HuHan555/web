@@ -1,0 +1,6 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "submit": "/components/submit/submit"
+  }
+}

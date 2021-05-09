@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "emoji": "/components/submit/emoji/emoji"
+  },
+  "component": true
+}
