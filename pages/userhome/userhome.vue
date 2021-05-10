@@ -77,6 +77,7 @@
 				email:'',
 				userphone:'',
 				ip:'',
+				
 			}
 		},
 		onReady() {
@@ -90,6 +91,7 @@
 			this.userphone=user1.phone
 			if(this.phone==user1.phone){
 				this.img=user1.Imgurl;
+				
 				this.email=user1.email;
 				
 			}else{
@@ -135,8 +137,12 @@
 				})
 			},
 			chooseImage(){
+				let Img=[]
+				Img.push(this.img)
 				let that=this
-				
+				uni.previewImage({
+					urls:Img
+				})
 			},
 			//回退
 			BackOne(){

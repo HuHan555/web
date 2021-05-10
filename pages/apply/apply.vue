@@ -2,7 +2,7 @@
 	<view>
 		<view class="main">
 			<view class="search-user result" >
-				<view class="title" >申请列表</view>
+				<view class="title" v-if="applyarr.length>0">申请列表</view>
 				<view class="list user" v-for="(item,index) in applyarr" :key="index">
 
 					<view @click="gouserhome(item.phone)" >

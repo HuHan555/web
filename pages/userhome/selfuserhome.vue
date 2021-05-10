@@ -87,7 +87,14 @@
 			// console.log(this.phone)
 		},
 		methods: {
-			
+			chooseImage(){
+				let Img=[]
+				Img.push(this.img)
+				let that=this
+				uni.previewImage({
+					urls:Img
+				})
+			},
 			
 			//回退
 			BackOne(){

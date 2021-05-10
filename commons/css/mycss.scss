@@ -9,6 +9,7 @@
 		padding-top: var(--status-bar-height);
 		width: 100%;
 		.top-bar-left{
+			
 			padding-left: $uni-spacing-col-base;
 			float: left;
 			image{
@@ -21,7 +22,7 @@
 				margin-top: 21rpx;
 				width: 26rpx;
 				height: 46rpx;
-				// solid red 1px;
+				
 			}
 			.text{
 				font-size: $uni-font-size-lg;

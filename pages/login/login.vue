@@ -65,7 +65,8 @@
 					dataType:'json',
 					data:{
 						phone:this.phone,
-						password:this.password
+						password:this.password,
+						
 					},
 					success:(res)=> {
 						// this.flag=res.data

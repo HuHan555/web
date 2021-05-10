@@ -1,7 +1,7 @@
 <template>
 	<view class="content">
 		<view class="top-bar">
-			<view class="top-bar-left" @click="BackOne()">
+			<view class="top-bar-left" @click="BackOne()">				
 				<image src="../../static/imgs/back.svg" class="back-img"></image>
 			</view>
 			<view class="top-bar-center">
@@ -84,7 +84,11 @@
 			this.img=user.Imgurl
 			
 			this.getmessage();
-			console.log(this.msg1)
+			// setInterval(()=>{
+			// 	this.clear()
+			// },1000);
+			
+			
 			let that=this
 			goEasy.subscribe({
 			    channel: that.chatphone,
@@ -110,15 +114,34 @@
 			});
 			// this.getMsg();
 		},
+		onShow() {
+			this.clear()
+		},
 		components:{
 			submit,
 		},
 		methods: {
-			
+			//进入后，使未读的消息已读
+			clear:function(){
+				let that=this
+				uni.request({
+					url:that.ip+"clear",
+					data:{
+						sendphone:that.chatphone,
+						recphone:that.phone,
+						
+					},
+					method:"POST",
+					success: (res) => {
+						
+					}
+				})
+			},
 			BackOne(){
 				uni.navigateBack({
 					delta:1,
 				});
+				
 			},
 			//处理时间
 			changeTime:function(date){
@@ -145,23 +168,6 @@
 			sendmessage:function(e){
 				
 				let that=this
-				// uni.request({
-				// 	url:'http://192.168.43.245:8080/sendmessage',
-				// 	data:{
-				// 		sendphone:that.phone,
-				// 		recphone:that.chatphone,
-				// 		message:e.message,
-				// 		stime:new Date(),
-				// 		types:"0",
-				// 		isvalid:"1"
-				// 	},
-				// 	method:'POST',
-				// 	success: (res) => {
-				// 		console.log(res)
-				// 	}
-				// })
-				
-					
 				let body = e.message;
 				if(e.length >= 50){
 					body = e.substring(0,30)+"...";
@@ -183,7 +189,21 @@
 						console.log("消息发送失败，错误编码："+error.code+" 错误信息："+error.content);
 					}
 				});
-				
+				uni.request({
+					url:that.ip+'sendmessage',
+					data:{
+						sendphone:that.phone,
+						recphone:that.chatphone,
+						message:e.message,
+						stime:new Date(),
+						types:"0",
+						isvalid:"1"
+					},
+					method:'POST',
+					success: (res) => {
+						console.log(res)
+					}
+				})
 			},
 			//输出变化高度
 			heights:function(e){

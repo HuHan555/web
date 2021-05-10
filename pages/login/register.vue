@@ -192,6 +192,7 @@
             phone: this.phone,
             password: this.password,
 			email:this.email,
+			isdoctor:"0"
           },
           method: 'POST',
           dataType: 'json',

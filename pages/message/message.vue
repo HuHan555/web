@@ -23,7 +23,7 @@
 			<view class="friends">
 				<view class="friend-list" @click="friendapply">
 					<view class="friend-list-l">
-						<text class="tip">{{applycount}}</text>
+						<text class="tip" v-if="applycount>0">{{applycount}}</text>
 						<image src="../../static/shilu-login/4.png"></image>
 					</view>
 					<view class="friend-list-r">
@@ -44,6 +44,21 @@
 					<view class="friend-list-r">
 						<view class="top">
 							<view class="name">系统通知</view>
+							<view class="time">12:12</view>
+						</view>
+						<view class="information">
+							茫茫人海，相聚就是缘分
+						</view>
+					</view>
+				</view>
+				<view class="friend-list" @click="gochatroom1(groupid.groupchannal,groupid.groupimg)">
+					<view class="friend-list-l">
+						<text class="tip">1</text>
+						<image :src="groupid.groupimg"></image>
+					</view>
+					<view class="friend-list-r">
+						<view class="top">
+							<view class="name">{{groupid.groupname}}</view>
 							<view class="time">12:12</view>
 						</view>
 						<view class="information">
@@ -88,6 +103,7 @@
 				urlphone:'',
 				applycount:'',
 				ip:'',
+				groupid:'',
 			}
 		},
 		onLoad(){
@@ -95,14 +111,19 @@
 			let user=uni.getStorageSync("user")
 			this.phone=user.phone
 			this.img=user.Imgurl
+			this.groupid=user.groupid
 			
 			if(this.img==null){
 				this.img="../../static/imgs/1.jpeg"
 			}
 			this.urlphone1()
 			//获得好友申请数量
-			this.getapplylist()
 			this.getFriends();
+			this.getapplylist()
+			setInterval(()=>{
+				this.getFriends();
+				this.getapplylist()
+			},1000);
 			// goEasy.subscribe({
 			//     channel: "19912451785",//替换为您自己的channel
 			//     onMessage: function (message) {
@@ -147,7 +168,6 @@
 							res.data[i].imgurl=that.ip+res.data[i].imgurl
 						}
 						that.friends=res.data
-						console.log(that.friends)
 					}
 				})
 			},
@@ -166,10 +186,16 @@
 					}
 				})
 			},
+			
 			//跳转到聊天页面
 			gochatroom:function(e,num){
 				uni.navigateTo({
 					url:"../chatroom/chatroom?chatphone="+e+"&chatimg="+num
+				})
+			},
+			gochatroom1:function(e,num){
+				uni.navigateTo({
+					url:"../chatroom/groupchatroom?chatphone="+e+"&chatimg="+num
 				})
 			},
 			//拼接根据电话的路由

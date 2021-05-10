@@ -12,6 +12,7 @@
 		<view class="main">
 			<view class="search-user result" >
 				<view class="title" v-if="userarr.length>0">用户</view>
+				
 				<view class="list user" v-for="(item,index) in userarr" :key="index">
 					
 					<view @click="gouserhome(item.phone,item.tip)" >
@@ -21,17 +22,22 @@
 						<view class="name" v-html="item.phone"></view>
 						<view class="email" v-html="item.email"></view>
 					</view>
-					<view class="right-button send" v-if="item.tip==1">发消息</view>
+					<view class="right-button send" v-if="item.tip==1" @click="gochatroom(item.phone,item.imgurl)">发消息</view>
 					<view class="right-button add" v-if="item.tip==0" @click="sendapply(item.phone)">加好友</view>
 				</view>
-				<!-- <view class="list user">
-					<image src="../../static/imgs/logo.png" mode=""></image>
-					<view class="names">
-						<view class="name">123</view>
-						<view class="email">123@163.com</view>
+				<view class="title" v-if="grouparr.length>0">群</view>
+				
+				<view class="list user" v-for="(item,index) in grouparr" :key="index">
+					
+					<view @click="gouserhome(item.phone,item.tip)" >
+						<image :src="item.groupimg" mode=""></image>
 					</view>
-					<view class="right-button add">加好友</view>
-				</view> -->
+					<view class="names">
+						<view class="name" v-html="item.groupname"></view>
+						<view class="email" v-html="item.createphone"></view>
+					</view>
+					<view class="right-button send" @click="sendgroupapply(item.createphone)">加入群</view>
+				</view>
 			</view>
 		</view>
 	</view>
@@ -45,12 +51,16 @@
 				userarr:[],
 				Arr:[],
 				ip:'',
+				phone:'',
+				groupid:'',
+				grouparr:[],
 			};
 		},
 		onLoad() {
 			this.ip=datas.ip()
 			let user=uni.getStorageSync("user")
 			this.phone=user.phone
+			this.groupid=user.groupid
 			let that=this
 			uni.request({
 				url:that.ip+'search/friends',
@@ -64,6 +74,16 @@
 			})
 		},
 		methods:{
+			gochatroom:function(e,num){
+				let exp=eval("/"+"<span style='color:#4AAAFF;'>"+"/g");
+					let exp1=eval("/"+"\\<\\/span\\>"+"/g");
+					// let reg=/<span style='color:#4AAAFF;'>/
+					e=e.replace(exp,'')
+					e=e.replace(exp1,'')
+				uni.navigateTo({
+					url:"../chatroom/chatroom?chatphone="+e+"&chatimg="+num
+				})
+			},
 			gouserhome:function(e,num){
 				let exp=eval("/"+"<span style='color:#4AAAFF;'>"+"/g");
 					let exp1=eval("/"+"\\<\\/span\\>"+"/g");
@@ -93,7 +113,7 @@
 				// let reg=/<span style='color:#4AAAFF;'>/
 				e=e.replace(exp,'')
 				e=e.replace(exp1,'')
-				console.log(e)
+				
 				
 				let that=this
 				uni.request({
@@ -102,7 +122,38 @@
 						sendphone:this.phone,
 						recphone:e,
 						sendtime:new Date(),
-						isvalid:"1"
+						isvalid:"1",
+						isgroup:'0'
+					},
+					method:"POST",
+					success:(res)=>{
+						if(res.data==true){
+							uni.showToast({
+							title: '发送成功'
+							});
+						}
+						
+					}
+				})
+			},
+			sendgroupapply:function(e){
+				// console.log(e)
+				let exp=eval("/"+"<span style='color:#4AAAFF;'>"+"/g");
+				let exp1=eval("/"+"\\<\\/span\\>"+"/g");
+				// let reg=/<span style='color:#4AAAFF;'>/
+				e=e.replace(exp,'')
+				e=e.replace(exp1,'')
+				console.log(e)
+				
+				let that=this
+				uni.request({
+					url:that.ip+'search/sendgroupapply',
+					data:{
+						sendphone:this.phone,
+						recphone:e,
+						sendtime:new Date(),
+						isvalid:"1",
+						isgroup:'1',
 					},
 					method:"POST",
 					success:(res)=>{
@@ -124,11 +175,15 @@
 			search:function (e) {
 				// console.log(e)
 				this.userarr=[];
-				
+				this.grouparr=[]
 				let searchval=e.detail.value;
 				if(searchval.length>0){
+					//如果输入的字符大于0
 					this.searchUser(searchval);
-					
+					//如果该用户已经有群
+					if(this.groupid==null){
+						this.searchgroup(searchval)
+					}
 				}
 			},
 			//寻找关键词匹配的用户
@@ -142,7 +197,7 @@
 					dataType:'json',
 					success:(res)=>{
 						let arr1=res.data
-						// console.log(arr1)
+						console.log(arr1)
 						let exp=eval("/"+e+"/g");
 						for(let i=0;i<arr1.length;i++){
 							arr1[i].imgurl=that.ip+arr1[i].imgurl
@@ -156,6 +211,33 @@
 							}
 						}
 						// console.log(this.userarr)
+					}
+				})
+				
+			},
+			// 寻找匹配的群
+			searchgroup:function(e){
+				// let arr=datas.friends();//模拟数据
+				
+				let that=this
+				uni.request({
+					url:that.ip+'search/group',
+					method:"POST",
+					dataType:'json',
+					success:(res)=>{
+						let arr1=res.data
+						
+						let exp=eval("/"+e+"/g");
+						for(let i=0;i<arr1.length;i++){
+							arr1[i].imgurl=that.ip+arr1[i].imgurl
+							if(arr1[i].groupname.search(e)!=-1 || arr1[i].createphone.search(e)!=-1){
+								
+								arr1[i].groupname=arr1[i].groupname.replace(exp,"<span style='color:#4AAAFF;'>"+e+"</span>");
+								arr1[i].createphone=arr1[i].createphone.replace(exp,"<span style='color:#4AAAFF;'>"+e+"</span>");
+								that.grouparr.push(arr1[i]);
+							}
+						}
+						console.log(that.grouparr)
 					}
 				})
 				
