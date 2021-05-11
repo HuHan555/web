@@ -53,16 +53,16 @@
 				</view>
 				<view class="friend-list" @click="gochatroom1(groupid.groupchannal,groupid.groupimg)">
 					<view class="friend-list-l">
-						<text class="tip">1</text>
+						<text class="tip" v-if="groupmessage.tip>0">{{groupmessage.tip}}</text>
 						<image :src="groupid.groupimg"></image>
 					</view>
 					<view class="friend-list-r">
 						<view class="top">
 							<view class="name">{{groupid.groupname}}</view>
-							<view class="time">12:12</view>
+							<view class="time">{{changeTime(groupmessage.sendtime)}}</view>
 						</view>
 						<view class="information">
-							茫茫人海，相聚就是缘分
+							{{groupmessage.message}}
 						</view>
 					</view>
 				</view>
@@ -104,6 +104,7 @@
 				applycount:'',
 				ip:'',
 				groupid:'',
+				groupmessage:{}
 			}
 		},
 		onLoad(){
@@ -120,10 +121,11 @@
 			//获得好友申请数量
 			this.getFriends();
 			this.getapplylist()
-			setInterval(()=>{
-				this.getFriends();
-				this.getapplylist()
-			},1000);
+			this.getgroupmessage()
+			// setInterval(()=>{
+			// 	this.getFriends();
+			// 	this.getapplylist()
+			// },1000);
 			// goEasy.subscribe({
 			//     channel: "19912451785",//替换为您自己的channel
 			//     onMessage: function (message) {
@@ -171,6 +173,20 @@
 					}
 				})
 			},
+			getgroupmessage:function(){
+				let that=this
+				uni.request({
+					url:that.ip+'latestgroupmessage',
+					data:{
+						groupid:that.groupid.groupid
+					},
+					
+					success:(res)=>{
+						that.groupmessage=res.data
+						console.log(that.groupmessage)
+					}
+				})
+			},
 			//获取好友申请数量
 			getapplylist:function(){
 				let that=this
@@ -183,6 +199,7 @@
 					success:(res)=>{
 						// console.log(res.data)
 						that.applycount=res.data.length
+						// that.appytime=res.data[]
 					}
 				})
 			},
@@ -212,9 +229,49 @@
 			},
 			//转换时间
 			changeTime:function(date){
-				return myfun.dateTime(date)
+				return this.dateTime(date)
 			},
-			
+			dateTime(d){
+				let nowtime=new Date();
+				let displaytime=new Date(d);
+				//获取老时间的具体时间
+				let disd=displaytime.getTime();
+				let dish=displaytime.getHours();
+				let dism=displaytime.getMinutes();
+				let disY=displaytime.getFullYear();
+				let disM=displaytime.getMonth()+1;
+				let disD=displaytime.getDate();
+				console.log(disD)
+				//获取现在时间的具体时间
+				let nowd=nowtime.getTime();
+				let nowh=nowtime.getHours();
+				let nowm=nowtime.getMinutes();
+				let nowY=nowtime.getFullYear();
+				let nowM=nowtime.getMonth()+1;
+				let nowD=nowtime.getDate();
+				
+				if(disY===nowY && disM===nowM && disD===nowD){
+					if(dish<10){
+						dish='0'+dish;
+					}
+					if(dism<10){
+						dism='0'+dism;
+					}
+					return dish+':'+dism;
+				}
+				
+				if(disY===nowY && disM===nowM && disD+1===nowD){
+					if(dish<10){
+						dish='0'+dish;
+					}
+					if(dism<10){
+						dism='0'+dism;
+					}
+					return "昨天"+dish+':'+dism;
+				}else{
+					return disY+'/'+disM+'/'+disD;
+				}
+			},
 			//跳转到聊天页面
 			goSearch:function(){
 				uni.navigateTo({

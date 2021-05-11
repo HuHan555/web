@@ -78,6 +78,10 @@
 					message:"",
 					Stime:''
 				},
+				group:{
+					groupchannal:""
+				},
+				groupid:''
 			}
 		},
 		onLoad:function(option){
@@ -88,28 +92,29 @@
 			let user=uni.getStorageSync("user")
 			this.phone=user.phone
 			this.img=user.Imgurl
+			this.groupid=user.groupid
+			this.getlist()
 			
-			// this.getmessage();
-			// setInterval(()=>{
-			// 	this.clear()
-			// },1000);
 			
 			
 			let that=this
 			goEasy.subscribe({
 			    channel: that.chatphone,
 			    onMessage: function (message) {
-					let len =that.msgs.length;
-					let data={
-						id:'a',
-						imgurl: that.chatimg,
-						message: message.content,
-						types: "0",
-						time: new Date(),
-						tip: len,
-					};
-					that.msgs.push(data);
-					that.goBottom();
+					let message1=JSON.parse(message.content)
+					if(message1.phone!=that.phone){
+						let len =that.msgs.length;
+						let data={
+							id:'a',
+							imgurl: message1.Imgurl,
+							message: message1.message,
+							types: "0",
+							time: new Date(),
+							tip: len,
+						};
+						that.msgs.push(data);
+						that.goBottom();
+					}
 			    },
 			    onSuccess: function () {
 			        console.log("订阅成功")
@@ -127,6 +132,8 @@
 			submit,
 		},
 		methods: {
+			
+			
 			//进入后，使未读的消息已读
 			clear:function(){
 				let that=this
@@ -181,10 +188,10 @@
 				that.form.phone=that.phone
 				that.form.Imgurl=that.img
 				that.form.message=body
-				that.form.Stime=new Date()
+				
 				goEasy.publish({
 					channel: that.chatphone,
-					message: that.form,
+					message: JSON.stringify(that.form),
 					//只要接收端APP参数以及GoEasy控制台参数正确配置，并且allowNotification为true，就可以接收通知栏提醒
 					//若不需要通知栏提醒，可以直接删掉notification
 					notification: {
@@ -198,21 +205,23 @@
 						console.log("消息发送失败，错误编码："+error.code+" 错误信息："+error.content);
 					}
 				});
-				// uni.request({
-				// 	url:that.ip+'sendmessage',
-				// 	data:{
-				// 		sendphone:that.phone,
-				// 		recphone:that.chatphone,
-				// 		message:e.message,
-				// 		stime:new Date(),
-				// 		types:"0",
-				// 		isvalid:"1"
-				// 	},
-				// 	method:'POST',
-				// 	success: (res) => {
-				// 		console.log(res)
-				// 	}
-				// })
+				that.group.groupchannal=that.chatphone
+				uni.request({
+					url:that.ip+'sendgroupmessage',
+					data:{
+						sendphone:that.phone,
+						recphone:that.groupid.groupid,
+						message:body,
+						stime:new Date(),
+						types:"0",
+						isvalid:"1",
+						
+					},
+					method:'POST',
+					success: (res) => {
+						console.log(res)
+					}
+				})
 			},
 			//输出变化高度
 			heights:function(e){
@@ -221,22 +230,22 @@
 				this.goBottom();
 			},
 			
-			getmessage:function(){
+			
+			//获取消息
+			getlist:function(){
 				let that=this
 				uni.request({
-					url:that.ip+'getchatmessage',
+					url:that.ip+'getlist',
 					data:{
+						groupid:that.groupid.groupid,
 						sendphone:that.phone,
-						recphone:that.chatphone
 					},
-					method:'POST',
 					success: (res) => {
-						console.log(res)
 						for(let i=0;i<res.data.length;i++){
 							res.data[i].imgurl=that.ip+res.data[i].imgurl
 						}
 						that.msg1=res.data
-						// console.log(that.msg1)
+						console.log(that.msg1)
 						that.getMsg()
 					}
 				})
